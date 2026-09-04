@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -8,9 +8,10 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  habits    Habit[]
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  habits        Habit[]
+  notifications Notification[]
 }
 
 model Habit {
@@ -30,4 +31,13 @@ model HabitEntry {
   habit     Habit    @relation(fields: [habitId], references: [id])
 
   @@unique([habitId, date])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getOrCreateSingleUser } from '@/lib/user';
-import { calculateHabitStreak } from '@/lib/streak';
+import { calculateHabitStreak, getRecent7Days } from '@/lib/streak';
 
 // GET /api/habits - List all habits with today's status and streak
 export async function GET(request: NextRequest) {
@@ -24,12 +24,14 @@ export async function GET(request: NextRequest) {
 
     const result = habits.map((habit) => {
       const { streak, doneToday } = calculateHabitStreak(habit.entries, targetTodayStr);
+      const recentDays = getRecent7Days(habit.entries, targetTodayStr);
       return {
         id: habit.id,
         name: habit.name,
         createdAt: habit.createdAt,
         doneToday,
         streak,
+        recentDays,
       };
     });
 
@@ -66,12 +68,23 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Create notification entry for new habit
+    await prisma.notification.create({
+      data: {
+        message: `New habit added: ${name}`,
+        userId: user.id,
+      },
+    });
+
+    const recentDays = getRecent7Days([]);
+
     return NextResponse.json({
       id: newHabit.id,
       name: newHabit.name,
       createdAt: newHabit.createdAt,
       doneToday: false,
       streak: 0,
+      recentDays,
     }, { status: 201 });
   } catch (error) {
     console.error('Error creating habit:', error);

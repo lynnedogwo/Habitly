@@ -4,12 +4,21 @@ import { useState } from 'react';
 import { Check, Edit2, Trash2, Flame, X, AlertCircle } from 'lucide-react';
 import { DeleteModal } from './DeleteModal';
 
+export interface DayStatus {
+  date: string;
+  dayLabel: string;
+  dayNumber: number;
+  isToday: boolean;
+  done: boolean;
+}
+
 export interface HabitItem {
   id: string;
   name: string;
   createdAt: string;
   doneToday: boolean;
   streak: number;
+  recentDays?: DayStatus[];
 }
 
 interface HabitCardProps {
@@ -33,7 +42,6 @@ export function HabitCard({ habit, onUpdate }: HabitCardProps) {
     setIsToggling(true);
 
     try {
-      // Local ISO date (YYYY-MM-DD)
       const now = new Date();
       const localDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
@@ -109,10 +117,10 @@ export function HabitCard({ habit, onUpdate }: HabitCardProps) {
   return (
     <>
       <div
-        className={`glass-panel rounded-2xl p-5 transition-all duration-300 ${
+        className={`light-panel rounded-2xl p-5 transition-all duration-200 ${
           habit.doneToday
-            ? 'border-emerald-500/30 bg-slate-900/60 glow-emerald'
-            : 'hover:border-slate-600/60'
+            ? 'border-emerald-300 bg-emerald-50/40'
+            : 'hover:border-slate-300'
         }`}
       >
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -139,13 +147,13 @@ export function HabitCard({ habit, onUpdate }: HabitCardProps) {
                     }}
                     autoFocus
                     disabled={isSaving}
-                    className="glass-input px-3 py-1.5 rounded-lg text-sm font-medium w-full max-w-xs"
+                    className="light-input px-3 py-1.5 rounded-lg text-sm font-medium w-full max-w-xs"
                   />
                   <button
                     onClick={handleSaveEdit}
                     disabled={isSaving}
                     title="Save name"
-                    className="p-2 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 transition-colors"
+                    className="p-2 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors cursor-pointer"
                   >
                     <Check className="w-4 h-4" />
                   </button>
@@ -157,24 +165,24 @@ export function HabitCard({ habit, onUpdate }: HabitCardProps) {
                     }}
                     disabled={isSaving}
                     title="Cancel edit"
-                    className="p-2 rounded-lg bg-slate-700/40 text-slate-400 hover:bg-slate-700/60 transition-colors"
+                    className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
 
                 {editError && (
-                  <div className="flex items-center gap-1.5 text-rose-400 text-xs font-medium">
+                  <div className="flex items-center gap-1.5 text-rose-600 text-xs font-semibold">
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>{editError}</span>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
                 <h3
-                  className={`text-base font-semibold transition-all ${
-                    habit.doneToday ? 'text-white line-through opacity-90' : 'text-slate-100'
+                  className={`text-base font-bold transition-all ${
+                    habit.doneToday ? 'text-slate-800 line-through opacity-85' : 'text-slate-900'
                   }`}
                 >
                   {habit.name}
@@ -183,31 +191,52 @@ export function HabitCard({ habit, onUpdate }: HabitCardProps) {
                 <button
                   onClick={() => setIsEditing(true)}
                   title="Edit habit name"
-                  className="opacity-60 hover:opacity-100 text-slate-400 hover:text-white p-1 rounded-md hover:bg-slate-800/50 transition-all"
+                  className="opacity-50 hover:opacity-100 text-slate-500 hover:text-slate-900 p-1 rounded-md hover:bg-slate-100 transition-all cursor-pointer"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}
 
-            {/* Streak Counter Badge */}
-            <div className="flex items-center gap-2 mt-2">
+            {/* Streak Counter Badge & 7-Day Streak History Row */}
+            <div className="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-slate-100">
+              {/* Existing Streak Badge */}
               <div
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
                   habit.streak > 0
-                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 glow-amber'
-                    : 'bg-slate-800/50 border-slate-700/50 text-slate-400'
+                    ? 'bg-amber-50 border-amber-300 text-amber-800'
+                    : 'bg-slate-100 border-slate-200 text-slate-500'
                 }`}
               >
                 <Flame
                   className={`w-3.5 h-3.5 ${
-                    habit.streak > 0 ? 'text-amber-400 fill-amber-400 animate-flame' : 'text-slate-500'
+                    habit.streak > 0 ? 'text-amber-500 fill-amber-500 animate-flame' : 'text-slate-400'
                   }`}
                 />
                 <span>
                   {habit.streak} {habit.streak === 1 ? 'day' : 'days'} streak
                 </span>
               </div>
+
+              {/* 7-Day Visual Row */}
+              {habit.recentDays && habit.recentDays.length > 0 && (
+                <div className="flex items-center gap-1.5 bg-slate-50/90 p-1.5 rounded-xl border border-slate-200/70">
+                  {habit.recentDays.map((day) => (
+                    <div
+                      key={day.date}
+                      title={`${day.date} (${day.dayLabel}): ${day.done ? 'Done' : 'Not done'}`}
+                      className={`flex flex-col items-center justify-center w-7 h-8 rounded-lg text-[10px] font-bold transition-all ${
+                        day.done
+                          ? 'bg-[#8B3DFF] text-white shadow-xs shadow-purple-500/20'
+                          : 'bg-slate-100 text-slate-400 border border-slate-200/80'
+                      } ${day.isToday ? 'ring-2 ring-[#8B3DFF]/40 ring-offset-1 font-black' : ''}`}
+                    >
+                      <span className="uppercase text-[8px] opacity-80 leading-none">{day.dayLabel.slice(0, 1)}</span>
+                      <span className="leading-tight mt-0.5">{day.dayNumber}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -216,20 +245,20 @@ export function HabitCard({ habit, onUpdate }: HabitCardProps) {
             <button
               onClick={handleToggleDone}
               disabled={isToggling}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-50 ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 ${
                 habit.doneToday
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-emerald-600/20 hover:from-emerald-500 hover:to-teal-500'
-                  : 'bg-slate-800/80 border border-slate-700/60 text-slate-300 hover:text-white hover:bg-slate-700/80'
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
+                  : 'btn-primary shadow-purple-500/20'
               }`}
             >
-              <Check className={`w-4 h-4 ${habit.doneToday ? 'text-white' : 'text-slate-400'}`} />
-              <span>{habit.doneToday ? 'Done Today' : 'Mark Done'}</span>
+              <Check className="w-4 h-4 text-white" />
+              <span className="text-white font-semibold">{habit.doneToday ? 'Done Today' : 'Mark Done'}</span>
             </button>
 
             <button
               onClick={() => setIsDeleteModalOpen(true)}
               title="Delete habit"
-              className="p-2.5 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all cursor-pointer"
+              className="p-2.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-all cursor-pointer"
             >
               <Trash2 className="w-4 h-4" />
             </button>

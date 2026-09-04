@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { calculateHabitStreak, formatDateToLocalISO } from '@/lib/streak';
+import { calculateHabitStreak, formatDateToLocalISO, getRecent7Days } from '@/lib/streak';
 
 // POST /api/habits/[id]/toggle - Toggle done/unmark status for today
 export async function POST(
@@ -63,6 +63,7 @@ export async function POST(
     }
 
     const { streak, doneToday } = calculateHabitStreak(habit.entries, dateStr);
+    const recentDays = getRecent7Days(habit.entries, dateStr);
 
     return NextResponse.json({
       id: habit.id,
@@ -70,6 +71,7 @@ export async function POST(
       createdAt: habit.createdAt,
       doneToday,
       streak,
+      recentDays,
     });
   } catch (error) {
     console.error('Error toggling habit entry:', error);

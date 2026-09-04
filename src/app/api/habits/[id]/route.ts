@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { calculateHabitStreak } from '@/lib/streak';
+import { calculateHabitStreak, getRecent7Days } from '@/lib/streak';
 
 // PATCH /api/habits/[id] - Edit habit name
 export async function PATCH(
@@ -30,6 +30,7 @@ export async function PATCH(
     });
 
     const { streak, doneToday } = calculateHabitStreak(updatedHabit.entries);
+    const recentDays = getRecent7Days(updatedHabit.entries);
 
     return NextResponse.json({
       id: updatedHabit.id,
@@ -37,6 +38,7 @@ export async function PATCH(
       createdAt: updatedHabit.createdAt,
       doneToday,
       streak,
+      recentDays,
     });
   } catch (error) {
     console.error('Error updating habit:', error);
