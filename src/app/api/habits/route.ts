@@ -68,13 +68,23 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create notification entry for new habit
-    await prisma.notification.create({
-      data: {
-        message: `New habit added: ${name}`,
-        userId: user.id,
-      },
-    });
+    // Create notification & send web push only if notifications are enabled
+    if (user.notificationsEnabled) {
+      await prisma.notification.create({
+        data: {
+          message: `New habit added: ${name}`,
+          userId: user.id,
+        },
+      });
+
+      // Import sendPushNotificationToUser dynamically or at top
+      const { sendPushNotificationToUser } = await import('@/lib/push');
+      await sendPushNotificationToUser(user.id, {
+        title: 'New Habit Added',
+        body: `You started tracking "${name}". Stay consistent!`,
+        url: '/',
+      });
+    }
 
     const recentDays = getRecent7Days([]);
 

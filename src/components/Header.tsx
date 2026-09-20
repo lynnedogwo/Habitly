@@ -22,16 +22,32 @@ export function Header({ title = 'Dashboard', subtitle }: HeaderProps) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    const today = new Date();
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    };
-    setFormattedDate(today.toLocaleDateString(undefined, options));
+  const [userProfile, setUserProfile] = useState<{ displayName: string | null; profilePicture: string | null } | null>(null);
+
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      const res = await fetch('/api/user');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          setUserProfile({
+            displayName: data.user.displayName,
+            profilePicture: data.user.profilePicture,
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching user profile in header:', err);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchUserProfile();
+    // Listen for custom event when profile updates in settings
+    const handleProfileUpdate = () => fetchUserProfile();
+    window.addEventListener('user-profile-updated', handleProfileUpdate);
+    return () => window.removeEventListener('user-profile-updated', handleProfileUpdate);
+  }, [fetchUserProfile]);
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -148,19 +164,25 @@ export function Header({ title = 'Dashboard', subtitle }: HeaderProps) {
             )}
           </div>
 
-          {/* Profile Icon Placeholder */}
-          <button
-            type="button"
-            title="Profile & Account (Placeholder UI element)"
-            className="flex items-center gap-2 p-1.5 pr-3 rounded-xl bg-white border border-slate-200 hover:border-purple-200 transition-all cursor-pointer shadow-2xs group"
+          {/* Profile Display Header Badge */}
+          <div
+            className="flex items-center gap-2 p-1.5 pr-3 rounded-xl bg-white border border-slate-200 shadow-2xs group"
           >
-            <div className="w-7 h-7 rounded-lg bg-purple-100 text-[#8B3DFF] flex items-center justify-center font-bold text-xs group-hover:bg-[#8B3DFF] group-hover:text-white transition-colors">
-              <User className="w-4 h-4" />
-            </div>
+            {userProfile?.profilePicture ? (
+              <img
+                src={userProfile.profilePicture}
+                alt="Profile"
+                className="w-7 h-7 rounded-lg object-cover border border-slate-200"
+              />
+            ) : (
+              <div className="w-7 h-7 rounded-lg bg-purple-100 text-[#8B3DFF] flex items-center justify-center font-bold text-xs group-hover:bg-[#8B3DFF] group-hover:text-white transition-colors">
+                <User className="w-4 h-4" />
+              </div>
+            )}
             <span className="text-xs font-bold text-slate-700 group-hover:text-[#8B3DFF] transition-colors hidden md:inline">
-              User
+              {userProfile?.displayName || 'User'}
             </span>
-          </button>
+          </div>
         </div>
       </div>
     </header>

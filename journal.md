@@ -57,3 +57,8 @@ Focused on turning the base habit tracker into something that actually feels usa
 ### Next
 - Test the app across a few real days to confirm streaks and progress numbers behave correctly over time, not just in a single session.
 - Write this week's Build in Public post about the two dashboard bugs, what broke and how they were found.
+### Styling & Design Token Refactor
+- Parsed `design-tokens.tokens (1).json` and converted all design tokens (colors, spacing, typography, grids, borders, radii, mapped component styles) into CSS custom properties in `:root` within `src/app/globals.css`.
+- Refactored existing CSS in `src/app/globals.css` to consume matching token variables (`var(--alias-primary-default)`, `var(--alias-neutral-white)`, `var(--alias-boarder-width-sm)`, `var(--alias-boarder-width-none)`, `var(--brand-scale-150)`).
+- Identified non-matching hardcoded values (off-white page background `#FEFEFE`, slate text/borders `#0f172a`, `#e2e8f0`, `#cbd5e1`, hover purple `#782CE6`, and animation timing `0.2s`/`2s`) and preserved them to ensure no layout or visual regressions.
+- Verified build and TypeScript compilation with `npx next build`.
