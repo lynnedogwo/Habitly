@@ -97,6 +97,7 @@ export default function DashboardPage() {
       {/* Main Action Header & Add Habit Button */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <Flame className="w-5 h-5 text-[#8B3DFF]" />
           <span>Daily Streak Overview</span>
           {totalHabits > 0 && (
             <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">

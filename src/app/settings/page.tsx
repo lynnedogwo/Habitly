@@ -13,6 +13,8 @@ import {
   ShieldAlert,
   Send,
   Sparkles,
+  AlertTriangle,
+  Loader2,
 } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { ResetDataModal } from '@/components/ResetDataModal';
@@ -596,8 +598,9 @@ export default function SettingsPage() {
             </div>
 
             {!notificationsEnabled && pushPermission === 'granted' && (
-              <p className="text-xs font-semibold text-amber-600 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
-                ⚠️ Notifications are turned off in Preference #2. Push notifications are currently blocked.
+              <p className="text-xs font-semibold text-amber-600 bg-amber-50 p-2.5 rounded-xl border border-amber-200 flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>Notifications are turned off in Preference #2. Push notifications are currently blocked.</span>
               </p>
             )}
 
