@@ -13,10 +13,11 @@ interface NotificationItem {
 interface HeaderProps {
   title?: string;
   subtitle?: string;
+  breadcrumb?: string;
   onNotificationChange?: () => void;
 }
 
-export function Header({ title = 'Dashboard', subtitle }: HeaderProps) {
+export function Header({ title = 'Dashboard', subtitle, breadcrumb }: HeaderProps) {
   const [formattedDate, setFormattedDate] = useState('');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -83,6 +84,11 @@ export function Header({ title = 'Dashboard', subtitle }: HeaderProps) {
   return (
     <header className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6 mb-8 pt-2">
       <div>
+        {breadcrumb && (
+          <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+            {breadcrumb}
+          </div>
+        )}
         <h1 className="text-2xl font-black text-slate-900 tracking-tight">{title}</h1>
         {subtitle && <p className="text-sm font-medium text-slate-500 mt-0.5">{subtitle}</p>}
       </div>
@@ -166,20 +172,20 @@ export function Header({ title = 'Dashboard', subtitle }: HeaderProps) {
 
           {/* Profile Display Header Badge */}
           <div
-            className="flex items-center gap-2 p-1.5 pr-3 rounded-xl bg-white border border-slate-200 shadow-2xs group"
+            className="flex items-center gap-2 p-1.5 pr-3 rounded-full bg-white border border-slate-200 shadow-2xs group"
           >
             {userProfile?.profilePicture ? (
               <img
                 src={userProfile.profilePicture}
                 alt="Profile"
-                className="w-7 h-7 rounded-lg object-cover border border-slate-200"
+                className="w-7 h-7 rounded-full object-cover border border-slate-200"
               />
             ) : (
-              <div className="w-7 h-7 rounded-lg bg-purple-100 text-[#8B3DFF] flex items-center justify-center font-bold text-xs group-hover:bg-[#8B3DFF] group-hover:text-white transition-colors">
+              <div className="w-7 h-7 rounded-full bg-purple-100 text-[#8B3DFF] flex items-center justify-center font-bold text-xs group-hover:bg-[#8B3DFF] group-hover:text-white transition-colors">
                 <User className="w-4 h-4" />
               </div>
             )}
-            <span className="text-xs font-bold text-slate-700 group-hover:text-[#8B3DFF] transition-colors hidden md:inline">
+            <span className="text-xs font-bold text-slate-700 group-hover:text-[#8B3DFF] transition-colors hidden md:inline pr-1">
               {userProfile?.displayName || 'User'}
             </span>
           </div>
