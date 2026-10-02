@@ -116,3 +116,25 @@ Committed all six settings features together in one commit this round, since the
 ## Next
 Confirm push notifications actually arrive correctly across a browser restart, not just immediately after granting permission.
 Split future feature batches into individual commits as they're completed, instead of committing everything at the end.
+
+## October 1st 2026
+Revisited the Settings page design. The functionality from the last entry was all working, but the layout felt too spread out, each setting was its own full card with a lot of vertical space between them. Used a reference design (a shadcn-based settings page) purely for layout and spacing ideas, not for its features.
+
+## Chages made
+Combined Display Name and Display Picture into a single "Profile" section instead of two separate cards, with the avatar sitting next to the name field instead of stacked above it.
+Added a small breadcrumb-style label above the main "Settings" heading.
+Tightened spacing across all setting cards so the page feels more compact and consistent.
+Restyled the selected state for the Light/Dark theme toggle to be cleaner.
+Increased corner roundness slightly and made spacing more consistent across all cards for a more cohesive look.
+
+## Decisions and why
+Pulled layout and spacing ideas from a shadcn reference design, but deliberately left out everything in that reference that did not apply here: email, job title, two-factor authentication, active sessions, team, and billing. None of those exist in this app and adding them would be scope creep, not a style fix.
+Kept the existing purple accent color (
+#8B3DFF) rather than adopting the reference's color scheme, since this was a layout and spacing change, not a rebrand.
+Did not change how light/dark mode works, only how the toggle looks when selected.
+
+## What I parked for later
+Matching dark mode specifically to the reference's dark color palette, this was left as a layout-only change for now, color is a separate decision if revisited later.
+Next
+Get a second opinion or test with a pod member on whether the new Profile section layout is clearer than the old stacked version.
+Keep an eye out for any other pages (Dashboard, My Habits) that could benefit from the same tightened spacing style.

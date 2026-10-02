@@ -13,7 +13,10 @@ Habit Tracker MVP lets you:
 - Edit a habit's name
 - Delete a habit
 - See a running streak count for each habit
-
+- See a running streak count and a 7-day streak row for each habit
+- See a Dashboard with Completed Today and Today's Progress summary cards
+- Navigate between Dashboard, My Habits, and Settings through a side nav
+- Customize the app through a full Settings page: theme, notification preferences, display name, display picture, push notifications, and a delete-all-data reset
 There is no login. The app uses a single fixed user record, and all data is stored in a real PostgreSQL database, not the browser.
 
 ## Who This Is For
@@ -23,7 +26,6 @@ Anyone who wants to track a small number of daily habits (2 to 10) without creat
 ## What This Is Not (Out of Scope for v1)
 
 - No login or multiple accounts
-- No reminders or notifications
 - No habit categories or tags
 - No quantity-based habits (only done / not done)
 - No weekly or custom frequency habits, daily only
@@ -31,7 +33,7 @@ Anyone who wants to track a small number of daily habits (2 to 10) without creat
 - No mobile app
 - No AI features
 - No vector database or search
-
+Notifications and push notifications were originally out of scope for v1 but were added deliberately afterward, see the Project Journal for that decision.
 These are documented decisions, not oversights. Keeping v1 this small was intentional, to ship something real and working in one week.
 
 ## Tech Stack
@@ -58,7 +60,8 @@ model User {
   createdAt DateTime @default(now())
   habits    Habit[]
 }
-
+// Additional fields added later for Settings:
+// displayName, profilePicture, notificationsEnabled, pushSubscriptions
 model Habit {
   id        String       @id @default(cuid())
   name      String
@@ -78,6 +81,8 @@ model HabitEntry {
   @@unique([habitId, date])
 }
 ```
+// Added later to support push notifications:
+// model PushSubscription { linked to User, stores browser push subscription data }
 
 ## Setup
 
@@ -102,12 +107,17 @@ model HabitEntry {
 - **Streak resets on first missed day:** Simplest rule to build, test, and explain. No grace periods in v1.
 - **No local storage:** Data lives in PostgreSQL through Prisma from the start, so nothing needs to be rebuilt when accounts are added later.
 - **Built by describing features to an AI coding tool:** No hand-written code, per the project's build constraint.
+- **Notifications made real, not just placeholders:** Originally planned as a visual-only badge, but changed to track real events once it became clear a placeholder would not actually be useful to test.
+- **Profile picture stored directly in the database:** Avoids adding a separate paid file storage service, keeping everything on free tiers.
+- **Push notifications added despite being more complex than in-app notifications:** Chosen deliberately to make the app genuinely useful day to day. Uses the free, standard Web Push API, no paid service required.
+- **Settings page combined into fewer, tighter sections after initial build:** Reworked the layout after the first version felt too spread out, grouping display name and picture into one Profile section.
 
 ## Known Limitations
 
 - No timezone handling. If your system clock or timezone is wrong, "today" may show incorrectly.
 - Single user only. Not meant to be shared publicly as a multi-user tool yet.
 - No safeguards against free-tier database limits, though usage at this scale should stay well within them.
+- Push notifications require the user to grant browser permission. If denied, they simply will not arrive.
 
 ## Project Journal
 
