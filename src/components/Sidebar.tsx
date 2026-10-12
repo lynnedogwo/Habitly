@@ -10,7 +10,7 @@ export function Sidebar() {
   const navItems = [
     {
       label: 'Dashboard',
-      href: '/',
+      href: '/dashboard',
       icon: LayoutDashboard,
     },
     {
@@ -29,7 +29,7 @@ export function Sidebar() {
     <aside className="w-full md:w-64 bg-white border-r border-slate-200 shrink-0 md:min-h-screen flex flex-col justify-between p-4 sm:p-6 shadow-xs">
       <div>
         {/* App Logo / Brand */}
-        <div className="flex items-center gap-3 px-3 py-2 mb-8">
+        <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 mb-8 group cursor-pointer">
           <div className="p-2.5 bg-[#8B3DFF] rounded-2xl shadow-md shadow-purple-500/25 flex items-center justify-center">
             <Flame className="w-6 h-6 text-white fill-white animate-flame" />
           </div>
@@ -39,15 +39,15 @@ export function Sidebar() {
             </h1>
             <p className="text-[11px] font-semibold text-slate-400">Daily Habit Tracker</p>
           </div>
-        </div>
+        </Link>
 
         {/* Navigation Items */}
         <nav className="space-y-1.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
-              item.href === '/'
-                ? pathname === '/'
+              item.href === '/dashboard'
+                ? pathname === '/dashboard'
                 : pathname.startsWith(item.href);
 
             return (
